@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Industry Hair Co. — Admin Panel</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #FAF8F5;
+    --warm-white: #FFFFFF;
+    --charcoal: #1C1A18;
+    --mid: #6B6560;
+    --light: #C8C4BE;
+    --border: #E8E4DE;
+    --accent: #B8956A;
+    --accent-light: #F5EDE0;
+    --danger: #C4553A;
+    --danger-light: #FBF0ED;
+    --success: #3A7A5A;
+    --success-light: #EDF5F0;
+    --shadow: 0 1px 3px rgba(28,26,24,0.08);
+    --shadow-md: 0 4px 16px rgba(28,26,24,0.1);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* LOGIN */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--charcoal);
+  }
+
+  .login-card {
+    background: var(--warm-white);
+    border-radius: 16px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+  }
+
+  .login-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--charcoal);
+    margin-bottom: 0.25rem;
+  }
+
+  .login-sub {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 2.5rem;
+  }
+
+  .login-card input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--charcoal);
+    background: var(--cream);
+    margin-bottom: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-card input:focus { border-color: var(--accent); }
+
+  .btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: var(--charcoal);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: #2C2A28; }
+
+  .login-error {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 0.75rem;
+    display: none;
+  }
+
+  /* MAIN APP */
+  #app { display: none; }
+
+  .header {
+    background: var(--charcoal);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.05em;
+  }
+
+  .header-logo span {
+    font-size: 11px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--light);
+    margin-left: 12px;
+  }
+
+  .header-logout {
+    font-size: 12px;
+    color: var(--light);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .header-logout:hover { color: white; }
+
+  .nav {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex;
+    gap: 0;
+  }
+
+  .nav-tab {
+    padding: 14px 20px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--mid);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+    letter-spacing: 0.02em;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .nav-tab:hover { color: var(--charcoal); }
+  .nav-tab.active { color: var(--charcoal); border-bottom-color: var(--accent); font-weight: 500; }
+
+  .main { max-width: 1000px; margin: 0 auto; padding: 2rem; }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--charcoal);
+    margin-bottom: 0.35rem;
+  }
+
+  .page-sub {
+    font-size: 13px;
+    color: var(--mid);
+    margin-bottom: 2rem;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  /* STYLIST GRID */
+  .stylist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .stylist-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s;
+  }
+
+  .stylist-card:hover { box-shadow: var(--shadow-md); }
+
+  .stylist-card.inactive { opacity: 0.5; }
+
+  .stylist-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+  }
+
+  .stylist-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .stylist-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--charcoal);
+  }
+
+  .stylist-level {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--mid);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  .badge-senior { background: var(--accent-light); color: var(--accent); }
+  .badge-intermediate { background: #EEF0F8; color: #5A6080; }
+  .badge-junior { background: var(--success-light); color: var(--success); }
+  .badge-inactive { background: #F2F2F2; color: var(--mid); }
+
+  .stylist-details {
+    font-size: 12px;
+    color: var(--mid);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .stylist-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-sm {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--charcoal);
+  }
+
+  .btn-sm:hover { background: var(--cream); }
+
+  .btn-sm.danger { border-color: #F0C8C0; color: var(--danger); }
+  .btn-sm.danger:hover { background: var(--danger-light); }
+
+  .btn-sm.success { border-color: #B8D8C8; color: var(--success); }
+  .btn-sm.success:hover { background: var(--success-light); }
+
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--charcoal);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    transition: background 0.15s;
+  }
+
+  .add-btn:hover { background: #2C2A28; }
+
+  /* FORM */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--mid);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  input[type="text"], input[type="url"], select, textarea {
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: var(--charcoal);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); background: white; }
+
+  textarea { resize: vertical; min-height: 80px; }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+  }
+
+  .btn-cancel {
+    padding: 10px 20px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--mid);
+  }
+
+  .btn-save {
+    padding: 10px 24px;
+    background: var(--charcoal);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(28,26,24,0.5);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-md);
+  }
+
+  .modal-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  /* SCORING TABLE */
+  .scoring-note {
+    background: var(--accent-light);
+    border: 1px solid #E8D5B8;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #8A6840;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .score-section-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin: 1.5rem 0 0.75rem;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .score-row {
+    display: grid;
+    grid-template-columns: 200px repeat(9, 1fr);
+    gap: 4px;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .score-row:last-child { border-bottom: none; }
+
+  .score-header {
+    display: grid;
+    grid-template-columns: 200px repeat(9, 1fr);
+    gap: 4px;
+    align-items: center;
+    padding: 8px 0;
+    margin-bottom: 4px;
+  }
+
+  .score-label {
+    font-size: 12px;
+    color: var(--charcoal);
+    padding-right: 8px;
+  }
+
+  .score-stylist-name {
+    font-size: 10px;
+    font-weight: 500;
+    text-align: center;
+    color: var(--mid);
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    padding: 4px 0;
+  }
+
+  .score-input {
+    width: 100%;
+    text-align: center;
+    padding: 4px 2px !important;
+    font-size: 12px !important;
+    min-width: 0;
+  }
+
+  /* QUICK LINKS */
+  .links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .link-card {
+    background: var(--warm-white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-decoration: none;
+    color: var(--charcoal);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: box-shadow 0.15s;
+    box-shadow: var(--shadow);
+  }
+
+  .link-card:hover { box-shadow: var(--shadow-md); }
+
+  .link-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .link-title { font-weight: 500; font-size: 14px; margin-bottom: 2px; }
+  .link-desc { font-size: 12px; color: var(--mid); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--charcoal);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    z-index: 300;
+    display: none;
+    box-shadow: var(--shadow-md);
+  }
+
+  .toast.show { display: block; }
+  .toast.success { background: var(--success); }
+  .toast.error { background: var(--danger); }
+
+  /* EMAIL PREVIEW */
+  .email-preview {
+    background: #F8F8F8;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem;
+    font-family: Georgia, serif;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+
+  .email-preview h3 { font-size: 16px; margin-bottom: 1rem; font-family: Georgia, serif; }
+
+  @media (max-width: 640px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .score-row, .score-header { grid-template-columns: 120px repeat(9, 1fr); }
+    .score-label { font-size: 11px; }
+    .main { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">Industry Hair Co.</div>
+    <div class="login-sub">Admin Panel</div>
+    <input type="password" id="password-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')login()">
+    <button class="btn-primary" onclick="login()">Sign in</button>
+    <div class="login-error" id="login-error">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="header">
+    <div class="header-logo">Industry Hair Co. <span>Admin</span></div>
+    <button class="header-logout" onclick="logout()">Sign out</button>
+  </div>
+
+  <div class="nav">
+    <button class="nav-tab active" onclick="showTab('stylists', this)">Stylists</button>
+    <button class="nav-tab" onclick="showTab('scoring', this)">Matching Rules</button>
+    <button class="nav-tab" onclick="showTab('emails', this)">Email Templates</button>
+    <button class="nav-tab" onclick="showTab('links', this)">Quick Links</button>
+  </div>
+
+  <div class="main">
+
+    <!-- STYLISTS TAB -->
+    <div class="section active" id="tab-stylists">
+      <div class="page-title">Stylists</div>
+      <div class="page-sub">Manage your team — add, edit, or temporarily deactivate stylists.</div>
+
+      <button class="add-btn" onclick="openAddStylist()">+ Add new stylist</button>
+
+      <div class="stylist-grid" id="stylist-grid"></div>
+    </div>
+
+    <!-- SCORING TAB -->
+    <div class="section" id="tab-scoring">
+      <div class="page-title">Matching Rules</div>
+      <div class="page-sub">Adjust how quiz answers score each stylist. 0 = no match, 1 = good fit, 2 = strong match.</div>
+
+      <div class="scoring-note">
+        Changes here update the matching logic immediately. A score of 2 means this stylist is a strong primary match for clients who select this answer. Use 0 to exclude a stylist from appearing for a specific answer.
+      </div>
+
+      <div class="card">
+        <div id="scoring-table">Loading scoring data...</div>
+        <div class="form-actions">
+          <button class="btn-save" onclick="saveScoring()">Save changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMAILS TAB -->
+    <div class="section" id="tab-emails">
+      <div class="page-title">Email Templates</div>
+      <div class="page-sub">Preview and edit your automated email templates.</div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Client Match Email</div>
+          <span class="badge badge-senior">Instant send</span>
+        </div>
+        <div class="email-preview">
+          <p>Hi [First Name],</p>
+          <p>The wait is over.</p>
+          <p>We went through everything you shared with us: your hair, your lifestyle, your vibe, and we found the stylists we think you're going to love. These matches weren't picked at random. Every single one was chosen with you in mind.</p>
+          <p>Meet your matches:</p>
+          <p>——————————————</p>
+          <p>✦ <strong>[Stylist Name]</strong></p>
+          <p><em>[Personalised AI match reason based on quiz answers]</em></p>
+          <p>🎥 Watch [Stylist]'s intro &nbsp;|&nbsp; 📸 Follow on Instagram</p>
+          <p>👉 Book with [Stylist]</p>
+          <p>——————————————</p>
+          <p><em>(Repeated for matches 2 and 3)</em></p>
+          <p>——————————————</p>
+          <p>Not sure who to choose? Trust your gut, there's no wrong choice here. Every one of these stylists was hand-picked for you, and whichever chair you land in, we know you're going to feel right at home.</p>
+          <p>We can't wait to meet you, but if you feel you need more clarity, please reach out and our admin team will help with any questions you have.</p>
+          <p>Your Most IHConic Match Awaits,<br>Team Industry</p>
+          <p>Industry Hair Co.<br>905-876-6309<br>info@industryhairco.com</p>
+        </div>
+        <p style="font-size:12px; color: var(--mid);">To edit this email, go to your Make.com scenario → Gmail module 31 → Content field.</p>
+        <a href="https://www.make.com" target="_blank" style="display:inline-block; margin-top:12px; padding:8px 16px; background:var(--charcoal); color:white; border-radius:8px; font-size:12px; text-decoration:none; font-family:'DM Sans',sans-serif;">Open Make.com →</a>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">Salon Notification Email</div>
+          <span class="badge badge-senior">Instant send</span>
+        </div>
+        <div class="email-preview">
+          <p><strong>New Match Alert — [Client Name]</strong></p>
+          <p>——————————————<br>MATCHED WITH<br>——————————————</p>
+          <p>1. [Match 1]<br>2. [Match 2]<br>3. [Match 3]</p>
+          <p>——————————————<br>CLIENT DETAILS<br>——————————————</p>
+          <p>Name / Email / Phone / Instagram</p>
+          <p>——————————————<br>HAIR PROFILE<br>——————————————</p>
+          <p>Hair type, description, length, concerns</p>
+          <p>——————————————<br>WHAT THEY'RE LOOKING FOR<br>——————————————</p>
+          <p>Service goal, colour direction, maintenance, frequency, investment mindset</p>
+          <p>——————————————<br>THEIR VIBE<br>——————————————</p>
+          <p>Personal style, free time, appointment experience, ideal stylist, level preference, history</p>
+          <p>——————————————<br>ADDITIONAL NOTES<br>——————————————</p>
+          <p>[Client notes or N/A]</p>
+        </div>
+        <p style="font-size:12px; color: var(--mid);">To edit this email, go to your Make.com scenario → Gmail module 33 → Content field.</p>
+        <a href="https://www.make.com" target="_blank" style="display:inline-block; margin-top:12px; padding:8px 16px; background:var(--charcoal); color:white; border-radius:8px; font-size:12px; text-decoration:none; font-family:'DM Sans',sans-serif;">Open Make.com →</a>
+      </div>
+    </div>
+
+    <!-- QUICK LINKS TAB -->
+    <div class="section" id="tab-links">
+      <div class="page-title">Quick Links</div>
+      <div class="page-sub">Everything you need, one click away.</div>
+
+      <div class="links-grid">
+        <a class="link-card" href="https://docs.google.com/spreadsheets/d/1AS7NpBdm4amgVKLewbhfUTjP1kSTVAKYfIXYZ5qIwjk/edit" target="_blank">
+          <div class="link-icon" style="background:#E8F5E9;">📊</div>
+          <div>
+            <div class="link-title">Submissions Log</div>
+            <div class="link-desc">View all quiz submissions</div>
+          </div>
+        </a>
+        <a class="link-card" href="https://www.make.com" target="_blank">
+          <div class="link-icon" style="background:#F3E5F5;">⚙️</div>
+          <div>
+            <div class="link-title">Make.com</div>
+            <div class="link-desc">Manage automations</div>
+          </div>
+        </a>
+        <a class="link-card" href="https://script.google.com" target="_blank">
+          <div class="link-icon" style="background:#E8F0FE;">🔧</div>
+          <div>
+            <div class="link-title">Apps Script</div>
+            <div class="link-desc">Edit matching logic script</div>
+          </div>
+        </a>
+        <a class="link-card" href="https://www.wix.com" target="_blank">
+          <div class="link-icon" style="background:#FFF8E1;">🌐</div>
+          <div>
+            <div class="link-title">Wix Editor</div>
+            <div class="link-desc">Edit your website & quiz</div>
+          </div>
+        </a>
+        <a class="link-card" href="https://www.phorest.com/salon/industryhairco" target="_blank">
+          <div class="link-icon" style="background:#FCE4EC;">📅</div>
+          <div>
+            <div class="link-title">Phorest Booking</div>
+            <div class="link-desc">View salon bookings</div>
+          </div>
+        </a>
+        <a class="link-card" href="https://console.anthropic.com" target="_blank">
+          <div class="link-icon" style="background:#F5EDE0;">🤖</div>
+          <div>
+            <div class="link-title">Anthropic Console</div>
+            <div class="link-desc">Monitor AI usage & costs</div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD/EDIT STYLIST MODAL -->
+<div class="modal-overlay" id="stylist-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Add new stylist</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>First name</label>
+        <input type="text" id="s-name" placeholder="e.g. Victoria">
+      </div>
+      <div class="form-group">
+        <label>Experience level</label>
+        <select id="s-level">
+          <option value="Senior">Senior</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Junior">Junior</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Specialties</label>
+        <textarea id="s-specialties" placeholder="e.g. Straight hair, soft blended colour, natural dimension"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Personality</label>
+        <textarea id="s-personality" placeholder="e.g. Warm, educational, creative, eco-conscious"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Best for</label>
+        <textarea id="s-bestfor" placeholder="e.g. Low-maintenance clients, straight hair clients"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Personal facts</label>
+        <textarea id="s-facts" placeholder="Facts the AI can reference when relevant to the client's answers"></textarea>
+      </div>
+      <div class="form-group full">
+        <label>Booking link</label>
+        <input type="url" id="s-booking" placeholder="https://www.phorest.com/salon/industryhairco/...">
+      </div>
+      <div class="form-group">
+        <label>Instagram URL</label>
+        <input type="url" id="s-instagram" placeholder="https://www.instagram.com/...">
+      </div>
+      <div class="form-group">
+        <label>Intro video URL</label>
+        <input type="url" id="s-video" placeholder="https://youtube.com/shorts/...">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveStylist()">Save stylist</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const PASSWORD = 'IHCmim2026!';
+
+const STYLISTS_KEY = 'ihc_stylists';
+const SCORING_KEY = 'ihc_scoring';
+
+const DEFAULT_STYLISTS = [
+  { id: 1, name: 'Victoria', level: 'Senior', active: true, specialties: 'Straight hair (fine or thick), soft blended colour, tone-on-tone colour, natural dimension', personality: 'Warm, educational, creative, eco-conscious, cat lover, gentle energy', bestFor: 'Low-maintenance clients, straight hair clients, soft natural colour', personalFacts: 'Cat mum to Chess, eco-conscious and passionate about recycling and sustainability, 10 years behind the chair', booking: 'https://www.phorest.com/salon/industryhairco/book/services?staffId=ca6y6oIxy8OGJVYHgXsN5A', instagram: 'https://www.instagram.com/torileehair/', video: 'https://youtube.com/shorts/-Smp4HhtLSs' },
+  { id: 2, name: 'Sara L.', level: 'Senior', active: true, specialties: 'All services, complex colour, colour corrections, advanced education, adaptable to all hair types', personality: 'Extroverted, warm, outdoorsy, dog lover, mom, educator at heart', bestFor: 'Clients who have struggled to find the right fit, complex colour needs', personalFacts: 'Married with two kids and a large dog, textbook extrovert, loves outdoors, Director of Education', booking: 'https://www.phorest.com/salon/industryhairco/book/services?staffId=MsrTfGKKYfddF8ciFWRa_Q', instagram: 'https://www.instagram.com/saraschair/', video: 'https://youtube.com/shorts/b3fanb7dN1k' },
+  { id: 3, name: 'Kelly', level: 'Senior', active: true, specialties: 'Curly and textured hair, blonde and brunette dimensional colour, vibrant reds and violets, extensions, bold statement or subtle looks', personality: 'Bold, energetic, transformational, fitness-minded, passionate', bestFor: 'Curly and textured clients, bold colour lovers, statement or subtle looks', personalFacts: 'Former fitness studio owner, Deva Curl certified, 10 years behind the chair', booking: 'https://www.phorest.com/salon/industryhairco/book/services?staffId=QDKcz6fU9Up4SLcrGU0W2g', instagram: 'https://www.instagram.com/kelly.hairboss/', video: 'https://youtube.com/shorts/P6XgAK4K9Lg' },
+  { id: 4, name: 'Sarah W.', level: 'Senior', active: true, specialties: 'Colour transformations, modern blonding, colour corrections, all hair types, confidence-driven results', personality: 'Loud but loving, adventurous, outdoorsy, mom, community-minded', bestFor: 'Big changes, colour corrections, clients who have felt unheard', personalFacts: 'Mom to a daughter and son, loves forest walks, 16 years behind the chair', booking: 'https://www.phorest.com/salon/industryhairco/book/services?staffId=heRCnMb0qDuvMYz-_w9kUQ', instagram: 'https://www.instagram.com/sarahwestwoodhair/', video: 'https://youtube.com/shorts/oK3NnBA6xJ0' },
+  { id: 5, name: 'Felicia', level: 'Senior', active: true, specialties: 'High-impact blonding, babylights, seamless grow-out, low-maintenance results, grey blending, long layered cuts', personality: 'Efficient, precise, relatable, busy mom energy, true crime fan', bestFor: 'Busy clients, blonde clients, seamless grow-out, efficiency-focused clients', personalFacts: 'Busy mom of two competitive sports boys, true crime obsessed, 11 years behind the chair', booking: 'https://www.phorest.com/salon/industryhairco/book/services?staffId=vdjr9SjbEDERpvQLG3a79g', instagram: 'https://www.instagram.com/thebeigefoil/', video: 'https://youtube.com/shorts/BZD5Wcjt-Fg' },
+  { id: 6, name: 'Caity', level: 'Intermediate', active: true, specialties: 'Extensions, dimensional blonding, vibrant colour, seamless colour', personality: 'Creative, music lover, easy-going, crochet hobbyist, calm energy', bestFor: 'Extension clients, fun colour, relaxed first-time experience', personalFacts: 'Music lover with 98 Spotify playlists, vinyl collector, trained at Paris Fashion Week', booking: 'https://www.phorest.com/salon/industryhairco/book/services?staffId=y7wmD07LgYlUfmmysRtqbg', instagram: 'https://www.instagram.com/caityschair/', video: 'https://youtube.com/shorts/u3ufKV6r0IM' },
+  { id: 7, name: 'Cori', level: 'Intermediate', active: true, specialties: 'Dimensional colour, grey blending, all colour types, cuts and colour', personality: 'Calm, quiet, homebody, coffee lover, dog walker, music fan', bestFor: 'Peaceful low-pressure appointments, results-focused clients, grey blend clients', personalFacts: 'Coffee lover, dog walker, homebody, 6 years behind the chair', booking: 'https://www.phorest.com/salon/industryhairco/book/services?staffId=X2yO0SnlGnPPTwr4SwOPFQ', instagram: 'https://www.instagram.com/cori.does.my.hair/', video: 'https://youtube.com/shorts/LStKqjrHZ9o' },
+  { id: 8, name: 'Marilia', level: 'Junior', active: true, specialties: 'All services except bleach and tone, extensions, detail-oriented work', personality: 'Warm, artistic, cat lover, music lover, patient', bestFor: 'Budget-conscious clients, clients wanting careful patient work', personalFacts: 'Born in the Azores Portugal, cat lover, passionate about art and musicals, trained under Victoria', booking: 'https://www.phorest.com/salon/industryhairco/book/services?staffId=iUo00EYrbPHmIR0D3hBrFA', instagram: 'https://www.instagram.com/mariliathestylist/', video: 'https://youtube.com/shorts/kBVaCOfLCkE' },
+  { id: 9, name: 'Jordyn', level: 'Junior', active: true, specialties: 'Highlights, blonding basics', personality: 'Energetic, country music fan, good vibes, passionate', bestFor: 'Budget-conscious clients, younger clients, fun upbeat experience', personalFacts: 'Country music fan, loves live concerts, 21 years old and building her clientele', booking: 'https://www.phorest.com/salon/industryhairco/book/services?staffId=Z2Wb62vuDgqKhhhN6yHpw', instagram: 'https://www.instagram.com/hair.by.jordyyn/', video: 'https://youtube.com/shorts/kLjMzCnP_U8' }
+];
+
+const SCORING_DATA = [
+  { section: 'Hair Type', rows: [
+    { answer: 'Straight', scores: [2,1,0,1,1,1,1,1,1] },
+    { answer: 'Wavy', scores: [1,1,1,1,1,1,1,1,1] },
+    { answer: 'Curly', scores: [0,1,2,1,0,0,0,0,0] },
+    { answer: 'Coily / Textured', scores: [0,1,2,1,0,0,0,0,0] }
+  ]},
+  { section: 'Hair Description', rows: [
+    { answer: 'Fine and thin', scores: [2,1,1,1,1,1,1,1,1] },
+    { answer: 'Thin but lots of it', scores: [1,1,1,1,1,1,1,1,1] },
+    { answer: 'Thick and coarse', scores: [0,1,2,1,1,1,1,1,1] }
+  ]},
+  { section: 'Service Goal', rows: [
+    { answer: 'Haircut', scores: [1,1,1,1,1,1,1,1,1] },
+    { answer: 'Colour', scores: [1,2,1,2,2,1,2,1,1] },
+    { answer: 'Cut and colour', scores: [1,2,1,2,2,1,2,1,1] },
+    { answer: 'Hair extensions', scores: [0,0,2,0,0,2,0,2,2] },
+    { answer: 'Formal or special occasion', scores: [1,1,0,2,2,0,0,0,2] },
+    { answer: 'Not sure yet', scores: [1,1,1,1,1,1,1,1,1] }
+  ]},
+  { section: 'Colour Direction', rows: [
+    { answer: 'Soft and natural', scores: [2,1,0,1,1,1,2,1,0] },
+    { answer: 'Bold and dimensional', scores: [0,1,2,2,2,2,2,0,1] },
+    { answer: 'Blonde', scores: [0,1,1,1,2,2,1,0,2] },
+    { answer: 'Brunette', scores: [1,1,2,1,2,1,2,1,1] },
+    { answer: 'Red or vibrant', scores: [0,1,2,2,0,2,1,0,1] },
+    { answer: 'Grey blend', scores: [1,1,0,1,2,0,2,0,0] },
+    { answer: 'One solid colour', scores: [1,1,1,1,1,1,1,1,1] }
+  ]},
+  { section: 'Maintenance', rows: [
+    { answer: 'Low — wash and go is the dream', scores: [2,1,1,1,2,1,1,1,1] },
+    { answer: 'Medium', scores: [1,1,1,1,1,1,1,1,1] },
+    { answer: 'High — full styling routine', scores: [1,1,2,1,1,2,1,1,1] }
+  ]},
+  { section: 'Visit Frequency', rows: [
+    { answer: 'Every 4–6 weeks', scores: [0,1,1,1,2,1,1,1,1] },
+    { answer: 'Every 2–3 months', scores: [1,1,1,1,2,1,1,1,1] },
+    { answer: 'Every 4–6 months', scores: [2,1,1,1,1,1,1,1,1] },
+    { answer: 'Once a year or less', scores: [2,1,1,1,0,1,1,1,1] }
+  ]},
+  { section: 'Investment Mindset', rows: [
+    { answer: 'Hair is a priority', scores: [2,2,2,2,2,1,1,0,0] },
+    { answer: 'Quality and value balance', scores: [1,1,1,1,1,2,2,1,1] },
+    { answer: 'Budget-conscious', scores: [0,0,0,0,0,1,1,2,2] }
+  ]},
+  { section: 'Personal Style', rows: [
+    { answer: 'Classic and polished', scores: [1,2,0,2,1,0,1,0,0] },
+    { answer: 'Effortless and natural', scores: [2,1,0,1,2,1,2,1,1] },
+    { answer: 'Bold and edgy', scores: [0,1,2,1,0,2,0,0,1] },
+    { answer: 'Trendy and fashion-forward', scores: [0,1,2,1,1,2,0,1,2] },
+    { answer: 'Laid-back and minimal', scores: [2,1,0,1,1,1,2,1,1] }
+  ]},
+  { section: 'Free Time', rows: [
+    { answer: 'Outdoors and active', scores: [1,2,2,1,1,1,1,1,1] },
+    { answer: 'Home body and cozy', scores: [1,0,0,1,1,1,2,2,0] },
+    { answer: 'Out with friends and social', scores: [1,2,1,1,1,2,0,1,1] },
+    { answer: 'Concerts, events and experiences', scores: [0,1,1,1,0,2,1,1,2] },
+    { answer: 'Busy with kids and family', scores: [1,1,0,1,2,1,1,2,1] }
+  ]},
+  { section: 'Appointment Experience', rows: [
+    { answer: 'Relax and take my time', scores: [2,2,1,2,0,1,1,1,0] },
+    { answer: 'Efficient — in and out', scores: [0,0,0,0,2,0,0,0,2] },
+    { answer: 'Learn about my hair', scores: [2,2,0,2,0,0,0,0,0] },
+    { answer: 'Just want to feel taken care of', scores: [1,2,1,2,1,2,1,2,2] }
+  ]},
+  { section: 'Ideal Stylist', rows: [
+    { answer: 'Caring and really listens', scores: [2,1,0,2,1,2,1,2,1] },
+    { answer: 'Takes the lead — trust the expert', scores: [0,2,2,2,2,0,1,0,0] },
+    { answer: 'Fun, exciting and creative', scores: [1,1,2,1,1,2,0,1,2] }
+  ]},
+  { section: 'Stylist Level', rows: [
+    { answer: 'Junior', scores: [0,0,0,0,0,0,0,2,2] },
+    { answer: 'Intermediate', scores: [0,0,0,0,0,2,2,0,0] },
+    { answer: 'Senior', scores: [2,2,2,2,2,0,0,0,0] },
+    { answer: 'No preference', scores: [1,1,1,1,1,1,1,1,1] }
+  ]},
+  { section: 'History with Stylists', rows: [
+    { answer: 'Bad experiences and nervous', scores: [2,2,0,2,1,1,1,1,0] },
+    { answer: 'Never found the right fit', scores: [0,2,2,2,1,1,1,1,1] },
+    { answer: 'Generally happy, new stylist', scores: [1,1,1,1,1,1,1,1,1] },
+    { answer: 'First time at a salon', scores: [1,1,1,1,1,2,1,1,2] }
+  ]}
+];
+
+let stylists = [];
+let scoring = [];
+let editingId = null;
+
+function login() {
+  const pw = document.getElementById('password-input').value;
+  if (pw === PASSWORD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function logout() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('password-input').value = '';
+}
+
+function initApp() {
+  const saved = localStorage.getItem(STYLISTS_KEY);
+  stylists = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_STYLISTS));
+  const savedScoring = localStorage.getItem(SCORING_KEY);
+  scoring = savedScoring ? JSON.parse(savedScoring) : JSON.parse(JSON.stringify(SCORING_DATA));
+  renderStylists();
+  renderScoring();
+}
+
+function saveStylists() {
+  localStorage.setItem(STYLISTS_KEY, JSON.stringify(stylists));
+}
+
+function renderStylists() {
+  const grid = document.getElementById('stylist-grid');
+  grid.innerHTML = stylists.map(s => `
+    <div class="stylist-card ${s.active ? '' : 'inactive'}">
+      <div class="stylist-header">
+        <div class="stylist-avatar">${s.name.charAt(0)}</div>
+        <div>
+          <div class="stylist-name">${s.name}</div>
+          <div class="stylist-level">
+            <span class="badge badge-${s.level.toLowerCase()}">${s.level}</span>
+            ${!s.active ? '<span class="badge badge-inactive" style="margin-left:6px;">Inactive</span>' : ''}
+          </div>
+        </div>
+      </div>
+      <div class="stylist-details">
+        <strong>Specialties:</strong> ${s.specialties}<br>
+        <strong>Best for:</strong> ${s.bestFor}
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+        ${s.video ? `<a href="${s.video}" target="_blank" style="font-size:11px; color:var(--accent); text-decoration:none;">▶ Video</a>` : ''}
+        ${s.instagram ? `<a href="${s.instagram}" target="_blank" style="font-size:11px; color:var(--mid); text-decoration:none;">📸 Instagram</a>` : ''}
+        ${s.booking ? `<a href="${s.booking}" target="_blank" style="font-size:11px; color:var(--mid); text-decoration:none;">📅 Booking</a>` : ''}
+      </div>
+      <div class="stylist-actions">
+        <button class="btn-sm" onclick="editStylist(${s.id})">Edit</button>
+        ${s.active 
+          ? `<button class="btn-sm danger" onclick="toggleActive(${s.id}, false)">Deactivate</button>`
+          : `<button class="btn-sm success" onclick="toggleActive(${s.id}, true)">Reactivate</button>`
+        }
+      </div>
+    </div>
+  `).join('');
+}
+
+function openAddStylist() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Add new stylist';
+  document.getElementById('s-name').value = '';
+  document.getElementById('s-level').value = 'Senior';
+  document.getElementById('s-specialties').value = '';
+  document.getElementById('s-personality').value = '';
+  document.getElementById('s-bestfor').value = '';
+  document.getElementById('s-facts').value = '';
+  document.getElementById('s-booking').value = '';
+  document.getElementById('s-instagram').value = '';
+  document.getElementById('s-video').value = '';
+  document.getElementById('stylist-modal').classList.add('open');
+}
+
+function editStylist(id) {
+  editingId = id;
+  const s = stylists.find(x => x.id === id);
+  document.getElementById('modal-title').textContent = 'Edit ' + s.name;
+  document.getElementById('s-name').value = s.name;
+  document.getElementById('s-level').value = s.level;
+  document.getElementById('s-specialties').value = s.specialties;
+  document.getElementById('s-personality').value = s.personality;
+  document.getElementById('s-bestfor').value = s.bestFor;
+  document.getElementById('s-facts').value = s.personalFacts;
+  document.getElementById('s-booking').value = s.booking;
+  document.getElementById('s-instagram').value = s.instagram;
+  document.getElementById('s-video').value = s.video;
+  document.getElementById('stylist-modal').classList.add('open');
+}
+
+function saveStylist() {
+  const data = {
+    name: document.getElementById('s-name').value.trim(),
+    level: document.getElementById('s-level').value,
+    specialties: document.getElementById('s-specialties').value.trim(),
+    personality: document.getElementById('s-personality').value.trim(),
+    bestFor: document.getElementById('s-bestfor').value.trim(),
+    personalFacts: document.getElementById('s-facts').value.trim(),
+    booking: document.getElementById('s-booking').value.trim(),
+    instagram: document.getElementById('s-instagram').value.trim(),
+    video: document.getElementById('s-video').value.trim(),
+    active: true
+  };
+
+  if (!data.name) { showToast('Please enter a name', 'error'); return; }
+
+  if (editingId) {
+    const idx = stylists.findIndex(x => x.id === editingId);
+    stylists[idx] = { ...stylists[idx], ...data };
+    showToast(data.name + ' updated successfully', 'success');
+  } else {
+    data.id = Date.now();
+    stylists.push(data);
+    showToast(data.name + ' added to the team', 'success');
+  }
+
+  saveStylists();
+  renderStylists();
+  closeModal();
+}
+
+function toggleActive(id, active) {
+  const s = stylists.find(x => x.id === id);
+  s.active = active;
+  saveStylists();
+  renderStylists();
+  showToast(s.name + (active ? ' reactivated' : ' deactivated'), active ? 'success' : '');
+}
+
+function closeModal() {
+  document.getElementById('stylist-modal').classList.remove('open');
+}
+
+function renderScoring() {
+  const stylistNames = ['Victoria', 'Sara L.', 'Kelly', 'Sarah W.', 'Felicia', 'Caity', 'Cori', 'Marilia', 'Jordyn'];
+  let html = '';
+
+  html += `<div class="score-header">
+    <div></div>
+    ${stylistNames.map(n => `<div class="score-stylist-name">${n}</div>`).join('')}
+  </div>`;
+
+  scoring.forEach((section, si) => {
+    html += `<div class="score-section-title">${section.section}</div>`;
+    section.rows.forEach((row, ri) => {
+      html += `<div class="score-row">
+        <div class="score-label">${row.answer}</div>
+        ${row.scores.map((score, i) => `
+          <input type="number" class="score-input" min="0" max="2" value="${score}" 
+            data-section="${si}" data-row="${ri}" data-col="${i}"
+            onchange="updateScore(${si},${ri},${i},this.value)">
+        `).join('')}
+      </div>`;
+    });
+  });
+
+  document.getElementById('scoring-table').innerHTML = html;
+}
+
+function updateScore(si, ri, col, val) {
+  scoring[si].rows[ri].scores[col] = parseInt(val) || 0;
+}
+
+function saveScoring() {
+  localStorage.setItem(SCORING_KEY, JSON.stringify(scoring));
+  showToast('Matching rules saved. Remember to update the IHC Matching Logic Google Sheet with these changes.', 'success');
+}
+
+function showTab(name, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+document.getElementById('password-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') login();
+});
+</script>
+</body>
+</html>
