@@ -1414,7 +1414,6 @@ function updateScore(si, ri, col, val) {
 
 async function saveScoring() {
   localStorage.setItem(SCORING_KEY, JSON.stringify(scoring));
-  
   showToast('Saving to Google Sheet...', '');
   
   var updates = [];
@@ -1429,11 +1428,7 @@ async function saveScoring() {
   });
   
   try {
-    var res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'updateScores', scores: updates })
-    });
+    var res = await fetch(SCRIPT_URL + '?action=updateScores&scores=' + encodeURIComponent(JSON.stringify(updates)));
     var data = await res.json();
     if (data.success) {
       showToast('Matching rules saved to Google Sheet — ' + data.updated + ' rows updated', 'success');
@@ -1444,7 +1439,7 @@ async function saveScoring() {
     showToast('Saved locally but could not reach Google Sheet. Please update manually.', 'error');
   }
 }
-
+  
 function showTab(name, el) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
