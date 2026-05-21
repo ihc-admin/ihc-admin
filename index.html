@@ -1412,9 +1412,37 @@ function updateScore(si, ri, col, val) {
   scoring[si].rows[ri].scores[col] = parseInt(val) || 0;
 }
 
-function saveScoring() {
+async function saveScoring() {
   localStorage.setItem(SCORING_KEY, JSON.stringify(scoring));
-  showToast('Matching rules saved. Remember to update the IHC Matching Logic Google Sheet with these changes.', 'success');
+  
+  showToast('Saving to Google Sheet...', '');
+  
+  var updates = [];
+  scoring.forEach(function(section) {
+    section.rows.forEach(function(row) {
+      updates.push({
+        question: section.section,
+        answer: row.answer,
+        scores: row.scores
+      });
+    });
+  });
+  
+  try {
+    var res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'updateScores', scores: updates })
+    });
+    var data = await res.json();
+    if (data.success) {
+      showToast('Matching rules saved to Google Sheet — ' + data.updated + ' rows updated', 'success');
+    } else {
+      showToast('Saved locally but Google Sheet update failed. Please update manually.', 'error');
+    }
+  } catch(e) {
+    showToast('Saved locally but could not reach Google Sheet. Please update manually.', 'error');
+  }
 }
 
 function showTab(name, el) {
