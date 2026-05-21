@@ -817,7 +817,7 @@
       <div class="page-sub">Adjust how quiz answers score each stylist. 0 = no match, 1 = good fit, 2 = strong match.</div>
 
       <div class="scoring-note">
-        Changes here update the matching logic immediately. A score of 2 means this stylist is a strong primary match for clients who select this answer. Use 0 to exclude a stylist from appearing for a specific answer.
+        Adjust scores below then click Save. You will see a summary of what changed with a direct link to update the Google Sheet. 0 = no match, 1 = good fit, 2 = strong match.
       </div>
 
       <div class="card">
@@ -825,6 +825,15 @@
         <div class="form-actions">
           <button class="btn-save" onclick="saveScoring()">Save changes</button>
         </div>
+      </div>
+
+      <div class="card" id="changes-summary" style="display:none;">
+        <div class="card-header">
+          <div class="card-title">Changes to apply to Google Sheet</div>
+          <a href="https://docs.google.com/spreadsheets/d/1AS7NpBdm4amgVKLewbhfUTjP1kSTVAKYfIXYZ5qIwjk/edit" target="_blank" style="padding:8px 16px; background:var(--charcoal); color:white; border-radius:8px; font-size:12px; text-decoration:none; font-family:'DM Sans',sans-serif;">Open Google Sheet</a>
+        </div>
+        <div id="changes-list" style="font-size:13px; line-height:2;"></div>
+        <p style="font-size:12px; color:var(--mid); margin-top:1rem;">Find each row in the Google Sheet and update the score for the stylist column shown.</p>
       </div>
     </div>
 
@@ -1043,7 +1052,6 @@
 
 <script>
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxJwV2awlrFnCL3QTgUkvN7LNLOUP4dghS3D7Dvi8H9yssQ82hDbTCvPQmkpv9WmlA/exec';
-  const PASSWORD = 'IHCmim2026!';
 
 async function generateInstagram() {
   const btn = document.getElementById('btn-instagram');
@@ -1412,34 +1420,56 @@ function updateScore(si, ri, col, val) {
   scoring[si].rows[ri].scores[col] = parseInt(val) || 0;
 }
 
-async function saveScoring() {
-  localStorage.setItem(SCORING_KEY, JSON.stringify(scoring));
-  showToast('Saving to Google Sheet...', '');
+function saveScoring() {
+  const stylistNames = ['Victoria', 'Sara L.', 'Kelly', 'Sarah W.', 'Felicia', 'Caity', 'Cori', 'Marilia', 'Jordyn'];
   
-  var updates = [];
-  scoring.forEach(function(section) {
-    section.rows.forEach(function(row) {
-      updates.push({
-        question: section.section,
-        answer: row.answer,
-        scores: row.scores
+  // Track what changed vs original
+  const original = JSON.parse(localStorage.getItem(SCORING_KEY) || 'null');
+  const changes = [];
+  
+  if (original) {
+    scoring.forEach((section, si) => {
+      section.rows.forEach((row, ri) => {
+        row.scores.forEach((score, ci) => {
+          const origScore = original[si] && original[si].rows[ri] ? original[si].rows[ri].scores[ci] : null;
+          if (origScore !== null && origScore !== score) {
+            changes.push({
+              question: section.section,
+              answer: row.answer,
+              stylist: stylistNames[ci],
+              from: origScore,
+              to: score
+            });
+          }
+        });
       });
     });
-  });
-  
-  try {
-    var res = await fetch(SCRIPT_URL + '?action=updateScores&scores=' + encodeURIComponent(JSON.stringify(updates)));
-    var data = await res.json();
-    if (data.success) {
-      showToast('Matching rules saved to Google Sheet — ' + data.updated + ' rows updated', 'success');
-    } else {
-      showToast('Saved locally but Google Sheet update failed. Please update manually.', 'error');
-    }
-  } catch(e) {
-    showToast('Saved locally but could not reach Google Sheet. Please update manually.', 'error');
   }
-}
   
+  localStorage.setItem(SCORING_KEY, JSON.stringify(scoring));
+  
+  if (changes.length === 0) {
+    showToast('No changes detected', '');
+    return;
+  }
+  
+  // Show changes summary
+  const summary = document.getElementById('changes-summary');
+  const list = document.getElementById('changes-list');
+  
+  list.innerHTML = changes.map(c => 
+    '<div style="padding:4px 0; border-bottom:1px solid var(--border);">' +
+    '<strong>' + c.stylist + '</strong> — ' + c.question + ': <em>' + c.answer + '</em> ' +
+    '<span style="color:var(--danger)">' + c.from + '</span> → ' +
+    '<span style="color:var(--success)">' + c.to + '</span>' +
+    '</div>'
+  ).join('');
+  
+  summary.style.display = 'block';
+  summary.scrollIntoView({ behavior: 'smooth' });
+  showToast(changes.length + ' change' + (changes.length > 1 ? 's' : '') + ' saved — update Google Sheet to apply', 'success');
+}
+
 function showTab(name, el) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
